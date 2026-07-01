@@ -8,7 +8,10 @@ urlpatterns = [
     path("", include("rental.urls")),
     path(
         "accounts/login/",
-        auth_views.LoginView.as_view(template_name="registration/login.html", authentication_form=SecureLoginForm),
+        auth_views.LoginView.as_view(
+            template_name="registration/login.html",
+            authentication_form=SecureLoginForm,
+        ),
         name="login",
     ),
     path(
