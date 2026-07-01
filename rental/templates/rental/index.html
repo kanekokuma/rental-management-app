@@ -1,0 +1,13 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<section class="hero">
+  <h1>大学備品貸出申請・管理アプリ</h1>
+
+  {% if user.is_authenticated %}
+    <a class="btn primary" href="{% url 'rental:item_list' %}">備品一覧を見る</a>
+  {% else %}
+    <a class="btn primary" href="{% url 'login' %}">ログインする</a>
+  {% endif %}
+</section>
+{% endblock %}

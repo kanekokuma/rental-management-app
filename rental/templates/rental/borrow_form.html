@@ -1,0 +1,15 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card">
+  <h1>貸出申請</h1>
+  <p><strong>対象備品：</strong>{{ item.name }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn primary" type="submit">申請する</button>
+    <a class="btn" href="{% url 'rental:item_detail' item.id %}">戻る</a>
+  </form>
+</div>
+{% endblock %}

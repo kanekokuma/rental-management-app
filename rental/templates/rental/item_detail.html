@@ -1,0 +1,26 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card">
+  <h1>{{ item.name }}</h1>
+
+  <p><strong>種類：</strong>{{ item.get_category_display }}</p>
+  <p><strong>状態：</strong><span class="status {{ item.status }}">{{ item.get_status_display }}</span></p>
+  <p><strong>備考：</strong>{{ item.note|linebreaksbr }}</p>
+
+  {% if active_loan %}
+    <div class="notice">
+      <p>現在貸出中です。</p>
+      <p>借用者：{{ active_loan.student_name }}</p>
+      <p>返却予定日：{{ active_loan.return_due_date }}</p>
+    </div>
+  {% endif %}
+
+  <div class="actions">
+    <a class="btn" href="{% url 'rental:item_list' %}">一覧へ戻る</a>
+    {% if item.status == "available" %}
+      <a class="btn primary" href="{% url 'rental:borrow_item' item.id %}">貸出申請</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

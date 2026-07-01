@@ -1,0 +1,44 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<h1>貸出中一覧</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>備品名</th>
+      <th>学生名</th>
+      <th>学籍番号</th>
+      <th>貸出日</th>
+      <th>返却予定日</th>
+      <th>状態</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for loan in loans %}
+      <tr class="{% if loan.is_overdue %}overdue{% endif %}">
+        <td>{{ loan.item.name }}</td>
+        <td>{{ loan.student_name }}</td>
+        <td>{{ loan.student_number }}</td>
+        <td>{{ loan.borrow_date }}</td>
+        <td>{{ loan.return_due_date }}</td>
+        <td>
+          {% if loan.is_overdue %}
+            期限超過
+          {% else %}
+            {{ loan.get_status_display }}
+          {% endif %}
+        </td>
+        <td>
+          <a class="btn small primary" href="{% url 'rental:return_item' loan.id %}">返却処理</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="7">現在貸出中の備品はありません。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

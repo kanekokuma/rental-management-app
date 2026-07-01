@@ -1,0 +1,16 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card narrow">
+  <h1>返却処理</h1>
+  <p>以下の備品を返却済みにしますか？</p>
+  <p><strong>備品：</strong>{{ loan.item.name }}</p>
+  <p><strong>借用者：</strong>{{ loan.student_name }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn primary" type="submit">返却済みにする</button>
+    <a class="btn" href="{% url 'rental:loan_list' %}">キャンセル</a>
+  </form>
+</div>
+{% endblock %}

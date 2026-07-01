@@ -1,0 +1,14 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card narrow">
+  <h1>備品削除</h1>
+  <p>「{{ item.name }}」を削除してもよろしいですか？</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn danger" type="submit">削除する</button>
+    <a class="btn" href="{% url 'rental:item_detail' item.id %}">キャンセル</a>
+  </form>
+</div>
+{% endblock %}

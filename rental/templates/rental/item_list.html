@@ -1,0 +1,72 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<h1>備品一覧</h1>
+
+<div class="list-toolbar" data-equipment-filter>
+  <div class="search-field">
+    <label for="item-search">キーワード検索</label>
+    <input id="item-search" type="search" placeholder="備品名・種類・状態で検索">
+  </div>
+
+  <form method="get" class="filter-form">
+    <select name="category" data-filter-category>
+      <option value="">種類すべて</option>
+    {% for value, label in category_choices %}
+      <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+    </select>
+
+    <select name="status" data-filter-status>
+      <option value="">状態すべて</option>
+    {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+    </select>
+
+    <!-- <button class="btn" type="submit">絞り込み</button> -->
+  </form>
+</div>
+
+<p class="list-summary" data-list-summary></p>
+
+<table data-equipment-table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>備品名</th>
+      <th>種類</th>
+      <th>状態</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+      <tr data-item-row data-name="{{ item.name }}" data-category="{{ item.category }}" data-category-label="{{ item.get_category_display }}" data-status="{{ item.status }}" data-status-label="{{ item.get_status_display }}">
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.get_category_display }}</td>
+        <td>
+          <span class="status {{ item.status }}">{{ item.get_status_display }}</span>
+        </td>
+        <td>
+          <a class="btn small" href="{% url 'rental:item_detail' item.id %}">詳細</a>
+          {% if item.status == "available" %}
+            <a class="btn small primary" href="{% url 'rental:borrow_item' item.id %}">貸出申請</a>
+          {% endif %}
+          {% if user.is_staff %}
+            <a class="btn small" href="{% url 'rental:item_edit' item.id %}">編集</a>
+            <a class="btn small danger" href="{% url 'rental:item_delete' item.id %}">削除</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr data-empty-row>
+        <td colspan="5">備品が登録されていません。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p class="empty-filter-message" data-filter-empty hidden>条件に一致する備品はありません。</p>
+{% endblock %}

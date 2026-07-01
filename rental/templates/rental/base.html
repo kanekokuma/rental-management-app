@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>学内備品貸出管理システム</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="logo" href="{% url 'rental:index' %}">学内備品貸出管理システム</a>
+      <nav>
+        {% if user.is_authenticated %}
+          <a href="{% url 'rental:item_list' %}">備品一覧</a>
+          {% if user.is_staff %}
+            <a href="{% url 'admin:index' %}">管理者画面</a>
+            <a href="{% url 'rental:item_create' %}">備品追加</a>
+            <a href="{% url 'rental:loan_list' %}">貸出中一覧</a>
+            <a href="{% url 'rental:loan_history' %}">貸出履歴</a>
+          {% endif %}
+          <span class="user">ログイン中：{{ user.username }}</span>
+          <form class="logout-form" method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">ログアウト</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">ログイン</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card">
+  <h1>{{ title }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn primary" type="submit">保存</button>
+    <a class="btn" href="{% url 'rental:item_list' %}">戻る</a>
+  </form>
+</div>
+{% endblock %}
