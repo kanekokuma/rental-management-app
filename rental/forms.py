@@ -1,5 +1,6 @@
 from django import forms
 from .models import Item, Loan
+from django.contrib.auth.forms import AuthenticationForm
 
 
 class ItemForm(forms.ModelForm):
@@ -19,3 +20,14 @@ class LoanForm(forms.ModelForm):
             "return_due_date": forms.DateInput(attrs={"type": "date"}),
             "purpose": forms.Textarea(attrs={"rows": 3}),
         }
+
+class SecureLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        label="ユーザー名",
+        widget=forms.TextInput(attrs={"autocomplete": "username", "autocapitalize": "none"}),
+    )
+    password = forms.CharField(
+        label="パスワード",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+    )
