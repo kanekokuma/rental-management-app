@@ -11,7 +11,10 @@
   {% if active_loan %}
     <div class="notice">
       <p>現在貸出中です。</p>
-      <p>借用者：{{ active_loan.student_name }}</p>
+      {% if request.user.is_staff %}
+        <p>借用者：{{ active_loan.student_name }}</p>
+        <p>学籍番号：{{ active_loan.student_number }}</p>
+      {% endif %}
       <p>返却予定日：{{ active_loan.return_due_date }}</p>
     </div>
   {% endif %}
