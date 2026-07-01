@@ -4,6 +4,11 @@
 <div class="card">
   <h1>貸出申請</h1>
   <p><strong>対象備品：</strong>{{ item.name }}</p>
+  <div class="notice">
+    <p><strong>申請者：</strong>{{ student_name }}</p>
+    <p><strong>学籍番号：</strong>{{ student_number }}</p>
+    <p>氏名と学籍番号はログイン中のアカウント情報から自動入力され、貸出申請画面では変更できません。</p>
+  </div>
 
   <form method="post">
     {% csrf_token %}
