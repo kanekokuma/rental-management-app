@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from rental.forms import SecureLoginForm
+
 
 app_name = "rental"
 
@@ -16,9 +16,4 @@ urlpatterns = [
     path("loans/", views.loan_list, name="loan_list"),
     path("loans/<int:loan_id>/return/", views.return_item, name="return_item"),
     path("history/", views.loan_history, name="loan_history"),
-    path(
-    "accounts/login/",
-    auth_views.LoginView.as_view(template_name="registration/login.html", authentication_form=SecureLoginForm),
-    name="login",
-    ),
 ]
