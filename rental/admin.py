@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .forms import StudentUserChangeForm, StudentUserCreationForm
-from .models import Item, Loan
+from .models import Item, Loan, Profile
 
 
 try:
@@ -41,6 +41,13 @@ class CustomUserAdmin(UserAdmin):
     @admin.display(description="学籍番号")
     def get_student_number(self, obj):
         return getattr(getattr(obj, "profile", None), "student_number", "")
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if "student_number" in form.cleaned_data:
+            profile, _ = Profile.objects.get_or_create(user=obj)
+            profile.student_number = form.cleaned_data["student_number"]
+            profile.save()
 
 
 @admin.register(Item)
