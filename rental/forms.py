@@ -14,7 +14,7 @@ class ItemForm(forms.ModelForm):
 class LoanForm(forms.ModelForm):
     class Meta:
         model = Loan
-        fields = ["student_name", "student_number", "purpose", "return_due_date"]
+        fields = ["purpose", "return_due_date"]
         widgets = {
             "return_due_date": forms.DateInput(attrs={"type": "date"}),
             "purpose": forms.Textarea(attrs={"rows": 3}),
