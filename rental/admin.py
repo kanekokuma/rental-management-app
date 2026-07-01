@@ -1,21 +1,22 @@
 from django.contrib import admin
+from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from .forms import StudentUserChangeForm, StudentUserCreationForm
-from .models import Item, Loan, Profile
+from .models import Item, Loan
 
 
-admin.site.unregister(User)
+try:
+    admin.site.unregister(User)
+except NotRegistered:
+    pass
 
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     form = StudentUserChangeForm
     add_form = StudentUserCreationForm
-
-    list_display = ("username", "get_full_name", "get_student_number", "is_staff", "is_active")
-    search_fields = ("username", "first_name", "last_name", "profile__student_number")
 
     fieldsets = (
         (None, {"fields": ("username", "password")}),
@@ -25,11 +26,17 @@ class CustomUserAdmin(UserAdmin):
     )
 
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": ("username", "first_name", "last_name", "student_number", "password1", "password2"),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "first_name", "last_name", "student_number", "password1", "password2"),
+            },
+        ),
     )
+
+    list_display = ("username", "get_full_name", "get_student_number", "is_staff", "is_active")
+    search_fields = ("username", "first_name", "last_name", "profile__student_number")
 
     @admin.display(description="学籍番号")
     def get_student_number(self, obj):
@@ -48,9 +55,3 @@ class LoanAdmin(admin.ModelAdmin):
     list_display = ("id", "item", "student_name", "student_number", "status", "borrow_date", "return_due_date", "return_date")
     list_filter = ("status", "borrow_date", "return_due_date")
     search_fields = ("student_name", "student_number", "purpose", "item__name")
-
-
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "student_number")
-    search_fields = ("user__username", "user__first_name", "user__last_name", "student_number")
