@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Item, Loan
+from .models import Item, Loan, Profile
 
 
 class ItemForm(forms.ModelForm):
@@ -48,7 +48,7 @@ class StudentUserCreationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
-            profile, _ = user.profile.__class__.objects.get_or_create(user=user)
+            profile, _ = Profile.objects.get_or_create(user=user)
             profile.student_number = self.cleaned_data.get("student_number", "")
             profile.save()
         return user
@@ -64,13 +64,13 @@ class StudentUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            profile = getattr(self.instance, "profile", None)
-            self.fields["student_number"].initial = getattr(profile, "student_number", "")
+            profile, _ = Profile.objects.get_or_create(user=self.instance)
+            self.fields["student_number"].initial = profile.student_number
 
     def save(self, commit=True):
         user = super().save(commit=commit)
         if commit:
-            profile, _ = user.profile.__class__.objects.get_or_create(user=user)
+            profile, _ = Profile.objects.get_or_create(user=user)
             profile.student_number = self.cleaned_data.get("student_number", "")
             profile.save()
         return user
