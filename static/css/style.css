@@ -237,15 +237,23 @@ th {
   text-transform: uppercase;
 }
 
-tbody tr {
+td:first-child,
+th:first-child {
+  padding-left: 26px;
+}
+
+/* punch-hole ledger detail, scoped to the first cell so it can never
+   introduce an extra table column (a pseudo-element on <tr> itself
+   gets wrapped in an anonymous cell by some browsers, which is what
+   was shifting every column over by one) */
+tbody td:first-child {
   position: relative;
 }
 
-/* punch-hole ledger detail on the leading edge of every row */
-tbody tr::before {
+tbody td:first-child::before {
   content: "";
   position: absolute;
-  left: 6px;
+  left: 8px;
   top: 50%;
   width: 5px;
   height: 5px;
@@ -253,11 +261,6 @@ tbody tr::before {
   background: var(--paper);
   box-shadow: inset 0 0 0 1px var(--line-strong);
   transform: translateY(-50%);
-}
-
-td:first-child,
-th:first-child {
-  padding-left: 24px;
 }
 
 tbody tr:last-child td {
@@ -365,26 +368,39 @@ tr.overdue:hover {
   --tag: var(--brass);
   --tag-ink: var(--brass-ink);
   --tag-bg: var(--brass-bg);
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 26px;
-  padding: 4px 12px 4px 10px;
+  padding: 4px 12px 4px 16px;
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  line-height: 1;
   color: var(--tag-ink);
-  background: var(--tag-bg);
-  border: 1px solid color-mix(in srgb, var(--tag) 45%, transparent);
-  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
   transform: rotate(-1deg);
 }
 
+/* the notched tag shape lives on its own layer behind the text, so the
+   clip-path only ever cuts the background — never the label or the dot */
 .status::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--tag-bg);
+  border: 1px solid color-mix(in srgb, var(--tag) 45%, transparent);
+  clip-path: polygon(9px 0, 100% 0, 100% 100%, 9px 100%, 0 50%);
+}
+
+.status::after {
   content: "";
   width: 5px;
   height: 5px;
+  flex: none;
   border-radius: 50%;
   background: var(--tag);
 }
