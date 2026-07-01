@@ -6,6 +6,11 @@ from django.utils import timezone
 from .forms import ItemForm, LoanForm
 from .models import Item, Loan
 
+def get_user_identity(user):
+    name = user.get_full_name() or user.username
+    profile = getattr(user, "profile", None)
+    student_number = getattr(profile, "student_number", "")
+    return name, student_number
 
 def is_admin(user):
     return user.is_staff
@@ -89,9 +94,14 @@ def item_delete(request, item_id):
 @login_required
 def borrow_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
+    student_name, student_number = get_user_identity(request.user)
 
     if item.status != "available":
         messages.error(request, "この備品は現在貸出できません。")
+        return redirect("rental:item_detail", item_id=item.id)
+
+    if not student_number:
+        messages.error(request, "貸出申請には学籍番号の登録が必要です。管理者にユーザー情報の登録を依頼してください。")
         return redirect("rental:item_detail", item_id=item.id)
 
     if request.method == "POST":
@@ -99,6 +109,8 @@ def borrow_item(request, item_id):
         if form.is_valid():
             loan = form.save(commit=False)
             loan.item = item
+            loan.student_name = student_name
+            loan.student_number = student_number
             loan.status = "borrowed"
             loan.borrow_date = timezone.localdate()
             loan.save()
@@ -109,12 +121,15 @@ def borrow_item(request, item_id):
             messages.success(request, "貸出申請が完了しました。")
             return redirect("rental:borrow_complete")
     else:
-        initial = {}
-        if request.user.is_authenticated:
-            initial["student_name"] = request.user.get_full_name() or request.user.username
-        form = LoanForm(initial=initial)
+        form = LoanForm()
 
-    return render(request, "rental/borrow_form.html", {"form": form, "item": item})
+    context = {
+        "form": form,
+        "item": item,
+        "student_name": student_name,
+        "student_number": student_number,
+    }
+    return render(request, "rental/borrow_form.html", context)
 
 
 @login_required
