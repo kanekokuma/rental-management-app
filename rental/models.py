@@ -23,8 +23,6 @@ def create_or_update_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     else:
         Profile.objects.get_or_create(user=instance)
-from django.db import models
-from django.utils import timezone
 
 
 class Item(models.Model):
@@ -37,6 +35,7 @@ class Item(models.Model):
 
     STATUS_CHOICES = [
         ("available", "貸出可能"),
+        ("pending", "申請中"),
         ("borrowed", "貸出中"),
         ("broken", "故障中"),
     ]
@@ -58,6 +57,7 @@ class Item(models.Model):
 
 class Loan(models.Model):
     LOAN_STATUS_CHOICES = [
+        ("pending", "申請中"),
         ("borrowed", "貸出中"),
         ("returned", "返却済み"),
     ]
@@ -69,7 +69,7 @@ class Loan(models.Model):
     borrow_date = models.DateField("貸出日", default=timezone.localdate)
     return_due_date = models.DateField("返却予定日")
     return_date = models.DateField("返却日", null=True, blank=True)
-    status = models.CharField("貸出状態", max_length=20, choices=LOAN_STATUS_CHOICES, default="borrowed")
+    status = models.CharField("貸出状態", max_length=20, choices=LOAN_STATUS_CHOICES, default="pending")
     created_at = models.DateTimeField("申請日時", auto_now_add=True)
 
     class Meta:
