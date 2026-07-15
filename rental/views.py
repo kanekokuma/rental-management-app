@@ -6,14 +6,16 @@ from django.utils import timezone
 from .forms import ItemForm, LoanForm
 from .models import Item, Loan
 
+
+def is_admin(user):
+    return user.is_staff
+
+
 def get_user_identity(user):
     name = user.get_full_name() or user.username
     profile = getattr(user, "profile", None)
     student_number = getattr(profile, "student_number", "")
     return name, student_number
-
-def is_admin(user):
-    return user.is_staff
 
 
 def index(request):
@@ -45,7 +47,7 @@ def item_list(request):
 @login_required
 def item_detail(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    active_loan = Loan.objects.filter(item=item, status="borrowed").first()
+    active_loan = Loan.objects.filter(item=item, status__in=["pending", "borrowed"]).first()
     return render(request, "rental/item_detail.html", {"item": item, "active_loan": active_loan})
 
 
@@ -111,14 +113,14 @@ def borrow_item(request, item_id):
             loan.item = item
             loan.student_name = student_name
             loan.student_number = student_number
-            loan.status = "borrowed"
+            loan.status = "pending"
             loan.borrow_date = timezone.localdate()
             loan.save()
 
-            item.status = "borrowed"
+            item.status = "pending"
             item.save()
 
-            messages.success(request, "貸出申請が完了しました。")
+            messages.success(request, "貸出申請を送信しました。管理者の受理後に貸出中になります。")
             return redirect("rental:borrow_complete")
     else:
         form = LoanForm()
@@ -135,6 +137,34 @@ def borrow_item(request, item_id):
 @login_required
 def borrow_complete(request):
     return render(request, "rental/borrow_complete.html")
+
+
+@user_passes_test(is_admin)
+def application_list(request):
+    loans = Loan.objects.filter(status="pending").select_related("item")
+    return render(request, "rental/application_list.html", {"loans": loans})
+
+
+@user_passes_test(is_admin)
+def approve_loan(request, loan_id):
+    loan = get_object_or_404(Loan, id=loan_id, status="pending")
+
+    if request.method == "POST":
+        if loan.item.status != "pending":
+            messages.error(request, "この備品は現在受理できる状態ではありません。")
+            return redirect("rental:application_list")
+
+        loan.status = "borrowed"
+        loan.borrow_date = timezone.localdate()
+        loan.save()
+
+        loan.item.status = "borrowed"
+        loan.item.save()
+
+        messages.success(request, "貸出申請を受理しました。")
+        return redirect("rental:loan_list")
+
+    return render(request, "rental/approve_confirm.html", {"loan": loan})
 
 
 @user_passes_test(is_admin)
