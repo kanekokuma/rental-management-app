@@ -1,13 +1,88 @@
 {% extends "rental/base.html" %}
 
 {% block content %}
-<section class="hero">
-  <h1>大学備品貸出申請・管理アプリ</h1>
+<section class="dashboard-hero">
+  <div>
+    <p class="eyebrow">Equipment Rental</p>
+    <h1>開志専門職大学貸出申請/管理アプリ</h1>
+    <p class="lead">学内備品の申請状況、貸出状況、返却状況を確認できます。</p>
+  </div>
 
-  {% if user.is_authenticated %}
-    <a class="btn primary" href="{% url 'rental:item_list' %}">備品一覧を見る</a>
-  {% else %}
-    <a class="btn primary" href="{% url 'login' %}">ログインする</a>
-  {% endif %}
+  <div class="dashboard-actions">
+    {% if user.is_authenticated %}
+      <a class="btn primary" href="{% url 'rental:item_list' %}">備品一覧を見る</a>
+      {% if user.is_staff %}
+        <a class="btn" href="{% url 'rental:application_list' %}">申請中一覧</a>
+      {% endif %}
+    {% else %}
+      <a class="btn primary" href="{% url 'login' %}">ログインする</a>
+    {% endif %}
+  </div>
 </section>
+
+<section class="dashboard-grid" aria-label="貸出状況の件数">
+  <a class="metric-card" href="{% url 'rental:item_list' %}">
+    <span class="metric-label">登録備品</span>
+    <strong>{{ dashboard.total_items }}</strong>
+    <span class="metric-help">登録されている備品数</span>
+  </a>
+
+  <a class="metric-card" href="{% url 'rental:item_list' %}?status=available">
+    <span class="metric-label">貸出可能</span>
+    <strong>{{ dashboard.available_items }}</strong>
+    <span class="metric-help">現在申請できる備品</span>
+  </a>
+
+  <a class="metric-card" href="{% url 'rental:item_list' %}?status=pending">
+    <span class="metric-label">申請中</span>
+    <strong>{{ dashboard.pending_items }}</strong>
+    <span class="metric-help">管理者の受理待ち</span>
+  </a>
+
+  <a class="metric-card" href="{% url 'rental:item_list' %}?status=borrowed">
+    <span class="metric-label">貸出中</span>
+    <strong>{{ dashboard.borrowed_items }}</strong>
+    <span class="metric-help">現在貸出されている備品</span>
+  </a>
+</section>
+
+{% if user.is_authenticated and user.is_staff %}
+  <section class="admin-dashboard">
+    <div class="section-heading">
+      <h2>管理者ダッシュボード</h2>
+    </div>
+
+    <div class="dashboard-grid compact">
+      <a class="metric-card accent" href="{% url 'rental:application_list' %}">
+        <span class="metric-label">受理待ち申請</span>
+        <strong>{{ dashboard.pending_loans }}</strong>
+        <span class="metric-help">確認が必要な申請</span>
+      </a>
+
+      <a class="metric-card" href="{% url 'rental:loan_list' %}">
+        <span class="metric-label">貸出中</span>
+        <strong>{{ dashboard.borrowed_loans }}</strong>
+        <span class="metric-help">返却処理待ち</span>
+      </a>
+
+      <a class="metric-card danger" href="{% url 'rental:loan_list' %}">
+        <span class="metric-label">期限超過</span>
+        <strong>{{ dashboard.overdue_loans }}</strong>
+        <span class="metric-help">返却予定日を過ぎた貸出</span>
+      </a>
+
+      <a class="metric-card" href="{% url 'rental:loan_history' %}">
+        <span class="metric-label">返却済み</span>
+        <strong>{{ dashboard.returned_loans }}</strong>
+        <span class="metric-help">完了した貸出履歴</span>
+      </a>
+    </div>
+
+    <div class="quick-actions">
+      <a class="btn primary" href="{% url 'rental:application_list' %}">申請を確認する</a>
+      <a class="btn" href="{% url 'rental:item_create' %}">備品を追加する</a>
+      <a class="btn" href="{% url 'admin:index' %}">管理者画面を開く</a>
+    </div>
+  </section>
+{% endif %}
 {% endblock %}
