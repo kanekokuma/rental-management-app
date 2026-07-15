@@ -19,7 +19,19 @@ def get_user_identity(user):
 
 
 def index(request):
-    return render(request, "rental/index.html")
+    today = timezone.localdate()
+    dashboard = {
+        "total_items": Item.objects.count(),
+        "available_items": Item.objects.filter(status="available").count(),
+        "pending_items": Item.objects.filter(status="pending").count(),
+        "borrowed_items": Item.objects.filter(status="borrowed").count(),
+        "broken_items": Item.objects.filter(status="broken").count(),
+        "pending_loans": Loan.objects.filter(status="pending").count(),
+        "borrowed_loans": Loan.objects.filter(status="borrowed").count(),
+        "overdue_loans": Loan.objects.filter(status="borrowed", return_due_date__lt=today).count(),
+        "returned_loans": Loan.objects.filter(status="returned").count(),
+    }
+    return render(request, "rental/index.html", {"dashboard": dashboard})
 
 
 @login_required
