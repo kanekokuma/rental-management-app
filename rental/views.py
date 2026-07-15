@@ -1,10 +1,27 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.views import LoginView
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
-from .forms import ItemForm, LoanForm
+from .forms import ItemForm, LoanForm, SecureLoginForm
 from .models import Item, Loan
+
+
+class AppLoginView(LoginView):
+    template_name = "registration/login.html"
+    authentication_form = SecureLoginForm
+
+    def get_success_url(self):
+        redirect_to = self.get_redirect_url()
+        if redirect_to:
+            return redirect_to
+
+        if self.request.user.is_staff:
+            return reverse("rental:index")
+
+        return reverse("rental:item_list")
 
 
 def is_admin(user):
