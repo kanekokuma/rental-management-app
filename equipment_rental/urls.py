@@ -1,17 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from rental.forms import SecureLoginForm
+from rental.views import AppLoginView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("rental.urls")),
     path(
         "accounts/login/",
-        auth_views.LoginView.as_view(
-            template_name="registration/login.html",
-            authentication_form=SecureLoginForm,
-        ),
+        AppLoginView.as_view(),
         name="login",
     ),
     path(
