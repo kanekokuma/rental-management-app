@@ -1,0 +1,20 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<div class="card narrow">
+  <h1>貸出申請の受理</h1>
+  <p>以下の貸出申請を受理しますか？</p>
+
+  <p><strong>備品：</strong>{{ loan.item.name }}</p>
+  <p><strong>学生名：</strong>{{ loan.student_name }}</p>
+  <p><strong>学籍番号：</strong>{{ loan.student_number }}</p>
+  <p><strong>使用目的：</strong>{{ loan.purpose|linebreaksbr }}</p>
+  <p><strong>返却予定日：</strong>{{ loan.return_due_date }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn primary" type="submit">受理する</button>
+    <a class="btn" href="{% url 'rental:application_list' %}">キャンセル</a>
+  </form>
+</div>
+{% endblock %}
