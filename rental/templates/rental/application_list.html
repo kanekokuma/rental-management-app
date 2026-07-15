@@ -1,0 +1,40 @@
+{% extends "rental/base.html" %}
+
+{% block content %}
+<h1>申請中一覧</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>備品名</th>
+      <th>学生名</th>
+      <th>学籍番号</th>
+      <th>使用目的</th>
+      <th>申請日</th>
+      <th>返却予定日</th>
+      <th>状態</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for loan in loans %}
+      <tr>
+        <td>{{ loan.item.name }}</td>
+        <td>{{ loan.student_name }}</td>
+        <td>{{ loan.student_number }}</td>
+        <td>{{ loan.purpose }}</td>
+        <td>{{ loan.borrow_date }}</td>
+        <td>{{ loan.return_due_date }}</td>
+        <td>{{ loan.get_status_display }}</td>
+        <td>
+          <a class="btn small primary" href="{% url 'rental:approve_loan' loan.id %}">受理処理</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="8">申請中の貸出はありません。</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
