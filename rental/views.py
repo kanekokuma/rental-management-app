@@ -15,11 +15,14 @@ class AppLoginView(LoginView):
 
     def get_success_url(self):
         redirect_to = self.get_redirect_url()
-        if redirect_to:
-            return redirect_to
 
         if self.request.user.is_staff:
+            if redirect_to and redirect_to.startswith(reverse("admin:index")):
+                return redirect_to
             return reverse("rental:index")
+
+        if redirect_to:
+            return redirect_to
 
         return reverse("rental:item_list")
 
