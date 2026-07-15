@@ -18,6 +18,7 @@
           {% if user.is_staff %}
             <a href="{% url 'admin:index' %}">管理者画面</a>
             <a href="{% url 'rental:item_create' %}">備品追加</a>
+            <a href="{% url 'rental:application_list' %}">申請中一覧</a>
             <a href="{% url 'rental:loan_list' %}">貸出中一覧</a>
             <a href="{% url 'rental:loan_history' %}">貸出履歴</a>
           {% endif %}
